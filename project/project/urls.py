@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('hello/', views.hello_view, name='hello'),
+    path('api/identify-chord/', views.identify_chord, name='identify_chord'),
 ]
