@@ -3,21 +3,30 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from music21 import *
+
 # Create your views here.
 def hello_view(request):
     return JsonResponse({"message": "Hello from Django!"})
 
 @api_view(['POST'])
 def identify_chord(request):
-    notes = request.data.get('notes', [])  # Assuming the notes are sent in the request body
-    chord_library = {
-        'C': ['C', 'E', 'G'],
-        'D': ['D', 'F#', 'A'],
-        # Add more chord definitions here...
-    }
+    # Define a series of notes
+    #notes = ['C', 'E', 'G', 'B']  # For example, a C major 7 chord
+    #notes = ['A#', 'G', 'D', 'F']
+    notes = request.data.get('notes', [])
 
-    for chord_name, chord_notes in chord_library.items():
-        if all(note in chord_notes for note in notes):
-            return Response({'chord': chord_name})
+    # Create Note objects from the note names
+    note_objects = [note.Note(n) for n in notes]
 
-    return Response({'chord': 'Unknown'})
+    # Create a Chord object from the Note objects
+    chord_object = chord.Chord(note_objects)
+
+    # Retrieve the specific chord name and root
+    chord_name = chord_object.pitchedCommonName
+    #chord_name = chord_object.commonName
+    chord_root = chord_object.root().nameWithOctave
+
+    print("Chord Name:", chord_name)
+    print("Chord Root:", chord_root)
+    return Response({'chord': chord_name})
