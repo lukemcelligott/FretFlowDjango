@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', views.hello_view, name='hello'),
     path('api/identify-chord/', views.identify_chord, name='identify_chord'),
+    path('api/gen-progression/', views.generate_chord_progression, name='generate-chord-progression'),
 ]
