@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -84,10 +85,12 @@ DATABASES = {
     # }
 
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'FretFlow',  # Database name
-        'HOST': 'localhost',
-        'PORT': '27017',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'FretFlow',
+        'USER': 'postgres',
+        'PASSWORD': 'Password1',
+        'HOST': 'localhost',  # Or the appropriate host
+        'PORT': '5432',  # Leave it empty to use the default port
     }
 }
 
@@ -139,3 +142,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # frontend domain
     # Add other domains as needed for your environment
 ]
+
+REST_FRAMEWORK = {
+    # Other configuration options
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.TemplateHTMLRenderer',
+        # Other renderer classes
+    ],
+    # Other configuration options
+}

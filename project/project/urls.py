@@ -20,7 +20,9 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hello/', views.hello_view, name='hello'),
-    path('api/identify-chord/', views.identify_chord, name='identify_chord'),
-    path('api/gen-progression/', views.generate_chord_progression, name='generate-chord-progression'),
+    path('hello/', views.hello_view, name='hello'), # test endpoint
+    path('api/identify-chord/', views.identify_chord, name='identify_chord'), # generating chord from notes
+    path('api/gen-progression/', views.generate_chord_progression, name='generate-chord-progression'), # generating chords in a key
+    path('api/auth/', views.auth, name="auth"), # login auth
+    path('api/signup/', views.save_user, name="save_user"), # saving user to db
 ]

@@ -1,13 +1,59 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from rest_framework import status
 from music21 import *
 
+from core.models import UserModel
+
 # Create your views here.
+# TEST ENDPOINT
 def hello_view(request):
     return JsonResponse({"message": "Hello from Django!"})
+
+# CREATE NEW USER
+@api_view(['POST'])
+def save_user(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    passwordConf = request.data.get('passwordConf')
+
+    if username and password and passwordConf:
+        if password == passwordConf:
+            try:
+                new_user = User(username=username)
+                new_user.set_password(password)
+                new_user.save()
+                
+                user_data = {
+                    'id': new_user.id,
+                    'username': new_user.username,
+                }
+
+                return JsonResponse({'message': 'User saved successfully!', 'user': user_data})
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return JsonResponse({'error': 'Invalid request. Username and password required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+# LOGIN AUTHENTICATION
+@api_view(['POST'])
+def auth(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    user = authenticate(username=username, password=password) # authenticate
+
+    if user is not None:
+        # Authentication successful
+        return JsonResponse({'message': 'Login successful'})
+    else:
+        # Authentication failed
+        return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
 # Given an array of notes, return the according chord
 @api_view(['POST'])
@@ -21,6 +67,8 @@ def identify_chord(request):
 
     return Response({'chord': chord_name})
 
+# GENERATE CHORD PROGRESSION METHODS
+# endpoint called when getting chords in a key
 @api_view(['GET'])
 def generate_chord_progression(request):
     # request params
@@ -34,9 +82,7 @@ def generate_chord_progression(request):
     return Response({'chord_progression': generated_chords})
 
 def generate_progression(selected_key, selected_acc, selected_major_minor):
-    # scales
     scale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-
     starting_index = scale.index(selected_key)
 
     progression = [
@@ -58,6 +104,5 @@ def generate_progression(selected_key, selected_acc, selected_major_minor):
     progression = ['C' if chord == 'B#' else chord for chord in progression]
 
     enharmonic_equivalents = {'C#': 'D♭', 'D#': 'E♭', 'F#': 'G♭', 'G#': 'A♭', 'A#': 'B♭', 'E#': 'F', 'B#': 'C'}
-    #progression = [enharmonic_equivalents[chord] if chord in enharmonic_equivalents else chord for chord in progression]
 
     return progression
