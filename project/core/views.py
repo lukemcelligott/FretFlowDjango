@@ -9,6 +9,7 @@ from rest_framework import status
 from music21 import *
 
 from core.models import UserModel
+from rest_framework_simplejwt.tokens import AccessToken
 
 # Create your views here.
 # TEST ENDPOINT
@@ -49,8 +50,9 @@ def auth(request):
     user = authenticate(username=username, password=password) # authenticate
 
     if user is not None:
-        # Authentication successful
-        return JsonResponse({'message': 'Login successful'})
+        # Authentication successful, generate JWT
+        access_token = AccessToken.for_user(user)
+        return JsonResponse({'token': str(access_token)})
     else:
         # Authentication failed
         return JsonResponse({'error': 'Invalid credentials'}, status=401)
